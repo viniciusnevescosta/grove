@@ -90,8 +90,8 @@ def has_staged_changes() -> bool:
         raise
 
 
-def format_commit_message(type_str: str, emoji: str, title: str, description: str) -> str:
-    commit_message = f"[{type_str}] {emoji} {title}"
+def format_commit_message(type_str: str, title: str, description: str) -> str:
+    commit_message = f"[{type_str}] {title}"
     if description:
         formatted_description = description.replace("/br", "\n")
         commit_message += f"\n\n{formatted_description}"
@@ -125,7 +125,10 @@ def prompt_for_files() -> List[str]:
         print_color("Please provide at least one file.", "yellow")
 
 
-def find_first_valid_type_index(args: List[str], valid_types: Dict[int, Tuple[str, str]]) -> Optional[int]:
+def find_first_valid_type_index(
+    args: List[str],
+    valid_types: Dict[int, Tuple[str, str]],
+) -> Optional[int]:
     for index, value in enumerate(args):
         if value.isdigit() and int(value) in valid_types:
             return index
@@ -326,13 +329,12 @@ def create_commit(
     stage_files(files_to_add)
 
     resolved_commit_type = resolve_commit_type(commit_type)
-    type_str, emoji_desc = COMMIT_TYPES[resolved_commit_type]
-    emoji = emoji_desc.split()[0]
+    type_str, _ = COMMIT_TYPES[resolved_commit_type]
 
     resolved_title = resolve_commit_title(title)
     resolved_description = resolve_commit_description(description)
 
-    full_message = format_commit_message(type_str, emoji, resolved_title, resolved_description)
+    full_message = format_commit_message(type_str, resolved_title, resolved_description)
 
     print_color("\nCommit message preview:", "blue")
     print(full_message)
