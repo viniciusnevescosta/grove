@@ -187,6 +187,56 @@ def stage_files(files_to_add: List[str]) -> None:
         sys.exit(1)
 
 
+def get_current_branch() -> str:
+    try:
+        result = subprocess.run(
+            ["git", "branch", "--show-current"],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        branch = result.stdout.strip()
+        if not branch:
+            print_color("Error: Could not determine the current branch (detached HEAD?).", "red")
+            sys.exit(1)
+        return branch
+    except subprocess.CalledProcessError as error:
+        print_color("Error: Could not determine the current branch.", "red")
+        if error.stderr:
+            print_color(error.stderr, "red")
+        sys.exit(1)
+
+
+def ensure_origin_remote() -> None:
+    try:
+        subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except subprocess.CalledProcessError as error:
+        print_color("Error: Remote 'origin' was not found.", "red")
+        if error.stderr:
+            print_color(error.stderr, "red")
+        sys.exit(1)
+
+
+def has_upstream() -> bool:
+    try:
+        subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
 def resolve_commit_type(commit_type: Optional[int]) -> int:
     if commit_type is not None:
         return commit_type
@@ -264,7 +314,12 @@ def confirm_action(message: str) -> None:
         sys.exit(0)
 
 
-def create_commit(files_to_add: List[str], commit_type: Optional[int], title: Optional[str], description: Optional[str]) -> None:
+def create_commit(
+    files_to_add: List[str],
+    commit_type: Optional[int],
+    title: Optional[str],
+    description: Optional[str],
+) -> None:
     if not files_to_add:
         files_to_add = prompt_for_files()
 
@@ -339,16 +394,79 @@ def create_branch(branch_type: Optional[int], description: Optional[str]) -> Non
         sys.exit(1)
 
 
+def push_current_branch() -> None:
+    ensure_origin_remote()
+    branch = get_current_branch()
+
+    print_color(f"Pushing current branch to remote: {branch}", "blue")
+
+    command = ["git", "push", "origin", branch]
+    if not has_upstream():
+        command = ["git", "push", "-u", "origin", branch]
+
+    try:
+        result = subprocess.run(
+            command,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        print_color(f"\n✓ Branch '{branch}' pushed successfully!", "green")
+        if result.stdout:
+            print(result.stdout)
+        if result.stderr:
+            print(result.stderr)
+    except subprocess.CalledProcessError as error:
+        print_color("\n✗ Error pushing branch:", "red")
+        if error.stderr:
+            print_color(error.stderr, "red")
+        else:
+            print_color(str(error), "red")
+        sys.exit(1)
+
+
+def pull_current_branch() -> None:
+    ensure_origin_remote()
+    branch = get_current_branch()
+
+    print_color(f"Pulling remote changes into current branch: {branch}", "blue")
+
+    try:
+        result = subprocess.run(
+            ["git", "pull", "origin", branch],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        print_color(f"\n✓ Branch '{branch}' pulled successfully!", "green")
+        if result.stdout:
+            print(result.stdout)
+        if result.stderr:
+            print(result.stderr)
+    except subprocess.CalledProcessError as error:
+        print_color("\n✗ Error pulling branch:", "red")
+        if error.stderr:
+            print_color(error.stderr, "red")
+        else:
+            print_color(str(error), "red")
+        sys.exit(1)
+
+
 def print_usage() -> None:
     print_color("Usage:", "blue")
     print("  grove -c <files...>")
     print("  grove -c <files...> <type-number> <title> [description]")
     print("  grove -b")
     print("  grove -b <type-number> [description]")
+    print("  grove push")
+    print("  grove pull")
     print("\nExamples:")
-    print("  grove -c src/main.py README.md 1 titulo-exemplo descricao-exemplo")
-    print('  grove -c src/main.py 1 "titulo exemplo" "descricao exemplo"')
+    print("  grove -c src/main.py README.md")
+    print("  grove -c src/main.py README.md 1 title-exemple description-example")
+    print('  grove -c src/main.py 1 "title" "description"')
     print("  grove -b 1 add-login-page")
+    print("  grove push")
+    print("  grove pull")
 
 
 def main() -> None:
@@ -370,8 +488,20 @@ def main() -> None:
     elif mode == "-b":
         branch_type, description = parse_branch_arguments(extra_args)
         create_branch(branch_type, description)
+    elif mode == "push":
+        if extra_args:
+            print_color("Error: 'grove push' does not accept additional arguments.", "red")
+            print_usage()
+            sys.exit(1)
+        push_current_branch()
+    elif mode == "pull":
+        if extra_args:
+            print_color("Error: 'grove pull' does not accept additional arguments.", "red")
+            print_usage()
+            sys.exit(1)
+        pull_current_branch()
     else:
-        print_color(f"Error: Unknown flag '{mode}'.", "red")
+        print_color(f"Error: Unknown flag or command '{mode}'.", "red")
         print_usage()
         sys.exit(1)
 
