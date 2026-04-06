@@ -73,14 +73,6 @@ https://github.com/viniciusnevescosta/grove/blob/main/grove.py
 
 ### Windows
 
-#### With install.py
-
-```bash
-python Install.py install
-```
-
-#### Manual
-
 1. Install Python 3.
 2. Download `grove.py`.
 3. Save it locally.
@@ -100,14 +92,6 @@ python C:\path\to\grove.py %*
 ```
 
 ### macOS
-
-#### With install.py
-
-```bash
-python3 Install.py install
-```
-
-#### Manual
 
 1. Make sure Python 3 is installed.
 2. Save the script as `grove`.
@@ -130,14 +114,6 @@ mv grove ~/.local/bin/grove
 ```
 
 ### Linux
-
-#### With install.py
-
-```bash
-python3 Install.py install
-```
-
-#### Manual
 
 1. Make sure Python 3 is installed.
 2. Save the script as `grove`.
