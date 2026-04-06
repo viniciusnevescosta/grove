@@ -1,7 +1,8 @@
 import re
+import shlex
 import subprocess
 import sys
-from typing import Dict, Tuple
+from typing import Dict, List, Optional, Tuple
 
 COLORS = {
     "red": "\033[91m",
@@ -83,8 +84,8 @@ def has_staged_changes() -> bool:
             stderr=subprocess.DEVNULL,
         )
         return False
-    except subprocess.CalledProcessError as e:
-        if e.returncode == 1:
+    except subprocess.CalledProcessError as error:
+        if error.returncode == 1:
             return True
         raise
 
@@ -106,7 +107,65 @@ def slugify_branch_description(description: str) -> str:
     return value
 
 
-def create_commit(files_to_add):
+def prompt_for_files() -> List[str]:
+    while True:
+        raw_files = get_valid_input(
+            "Enter the files to stage (separate with spaces): ",
+            lambda x: bool(x.strip()),
+        )
+        try:
+            files = shlex.split(raw_files)
+        except ValueError:
+            print_color("Invalid file list. Check your quotes and try again.", "yellow")
+            continue
+
+        if files:
+            return files
+
+        print_color("Please provide at least one file.", "yellow")
+
+
+def find_first_valid_type_index(args: List[str], valid_types: Dict[int, Tuple[str, str]]) -> Optional[int]:
+    for index, value in enumerate(args):
+        if value.isdigit() and int(value) in valid_types:
+            return index
+    return None
+
+
+def parse_commit_arguments(args: List[str]) -> Tuple[List[str], Optional[int], Optional[str], Optional[str]]:
+    type_index = find_first_valid_type_index(args, COMMIT_TYPES)
+
+    if type_index is None:
+        return args, None, None, None
+
+    files = args[:type_index]
+    metadata = args[type_index:]
+
+    commit_type = int(metadata[0]) if metadata else None
+    title = metadata[1] if len(metadata) >= 2 else None
+    description = " ".join(metadata[2:]) if len(metadata) >= 3 else None
+
+    return files, commit_type, title, description
+
+
+def parse_branch_arguments(args: List[str]) -> Tuple[Optional[int], Optional[str]]:
+    if not args:
+        return None, None
+
+    branch_type = None
+    description = None
+
+    if args[0].isdigit() and int(args[0]) in BRANCH_TYPES:
+        branch_type = int(args[0])
+        if len(args) >= 2:
+            description = " ".join(args[1:])
+    else:
+        description = " ".join(args)
+
+    return branch_type, description
+
+
+def stage_files(files_to_add: List[str]) -> None:
     try:
         print_color(f"Staging files: {', '.join(files_to_add)}", "blue")
         subprocess.run(
@@ -116,8 +175,8 @@ def create_commit(files_to_add):
             stderr=subprocess.PIPE,
             text=True,
         )
-    except subprocess.CalledProcessError as e:
-        print_color(f"Error staging files: {e.stderr}", "red")
+    except subprocess.CalledProcessError as error:
+        print_color(f"Error staging files: {error.stderr}", "red")
         sys.exit(1)
 
     if not has_staged_changes():
@@ -127,40 +186,103 @@ def create_commit(files_to_add):
         )
         sys.exit(1)
 
+
+def resolve_commit_type(commit_type: Optional[int]) -> int:
+    if commit_type is not None:
+        return commit_type
+
     print("\nSelect the commit type:")
     for num, (_, desc) in COMMIT_TYPES.items():
         print(f"{num}. {desc}")
 
-    commit_type = int(
+    return int(
         get_valid_input(
             "\nEnter the number corresponding to the commit type: ",
             lambda x: x.isdigit() and int(x) in COMMIT_TYPES,
         )
     )
 
-    type_str, emoji_desc = COMMIT_TYPES[commit_type]
-    emoji = emoji_desc.split()[0]
 
-    title = get_valid_input(
+def resolve_branch_type(branch_type: Optional[int]) -> int:
+    if branch_type is not None:
+        return branch_type
+
+    print("\nSelect the branch type:")
+    for num, (_, desc) in BRANCH_TYPES.items():
+        print(f"{num}. {desc}")
+
+    return int(
+        get_valid_input(
+            "\nEnter the number corresponding to the branch type: ",
+            lambda x: x.isdigit() and int(x) in BRANCH_TYPES,
+        )
+    )
+
+
+def resolve_commit_title(title: Optional[str]) -> str:
+    if title is not None:
+        if 0 < len(title) <= 72:
+            return title
+        print_color("Error: Commit title must have between 1 and 72 characters.", "red")
+        sys.exit(1)
+
+    return get_valid_input(
         "Enter the commit title (required, max 72 chars): ",
         lambda x: 0 < len(x) <= 72,
     )
 
-    description = get_valid_input(
+
+def resolve_commit_description(description: Optional[str]) -> str:
+    if description is not None:
+        return description
+
+    return get_valid_input(
         "Enter the commit description (optional, use '/br' for new lines, press 'Enter' to skip): ",
         lambda x: True,
         optional=True,
     )
 
-    full_message = format_commit_message(type_str, emoji, title, description)
+
+def resolve_branch_description(description: Optional[str]) -> str:
+    if description is not None:
+        slug = slugify_branch_description(description)
+        if slug:
+            return description
+        print_color("Error: Branch description is invalid after normalization.", "red")
+        sys.exit(1)
+
+    return get_valid_input(
+        "Enter the branch description (required): ",
+        lambda x: len(slugify_branch_description(x)) > 0,
+    )
+
+
+def confirm_action(message: str) -> None:
+    confirm = input(message).strip().lower()
+    if confirm not in ("", "y", "yes"):
+        print_color("Operation cancelled.", "yellow")
+        sys.exit(0)
+
+
+def create_commit(files_to_add: List[str], commit_type: Optional[int], title: Optional[str], description: Optional[str]) -> None:
+    if not files_to_add:
+        files_to_add = prompt_for_files()
+
+    stage_files(files_to_add)
+
+    resolved_commit_type = resolve_commit_type(commit_type)
+    type_str, emoji_desc = COMMIT_TYPES[resolved_commit_type]
+    emoji = emoji_desc.split()[0]
+
+    resolved_title = resolve_commit_title(title)
+    resolved_description = resolve_commit_description(description)
+
+    full_message = format_commit_message(type_str, emoji, resolved_title, resolved_description)
 
     print_color("\nCommit message preview:", "blue")
     print(full_message)
 
-    confirm = input("\nConfirm commit? [Y/n] ").strip().lower()
-    if confirm not in ("", "y", "yes"):
-        print_color("Commit cancelled.", "yellow")
-        sys.exit(0)
+    confirm_action("\nConfirm commit? [Y/n] ")
 
     try:
         result = subprocess.run(
@@ -171,44 +293,27 @@ def create_commit(files_to_add):
         )
         print_color("\n✓ Commit created successfully!", "green")
         print(result.stdout)
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError as error:
         print_color("\n✗ Error creating commit:", "red")
-        print_color(e.stderr, "red")
+        print_color(error.stderr, "red")
         sys.exit(1)
     except KeyboardInterrupt:
         print_color("\nOperation cancelled by user.", "yellow")
         sys.exit(1)
 
 
-def create_branch():
-    print("\nSelect the branch type:")
-    for num, (_, desc) in BRANCH_TYPES.items():
-        print(f"{num}. {desc}")
+def create_branch(branch_type: Optional[int], description: Optional[str]) -> None:
+    resolved_branch_type = resolve_branch_type(branch_type)
+    type_str, _ = BRANCH_TYPES[resolved_branch_type]
 
-    branch_type = int(
-        get_valid_input(
-            "\nEnter the number corresponding to the branch type: ",
-            lambda x: x.isdigit() and int(x) in BRANCH_TYPES,
-        )
-    )
-
-    type_str, _ = BRANCH_TYPES[branch_type]
-
-    description = get_valid_input(
-        "Enter the branch description (required): ",
-        lambda x: len(slugify_branch_description(x)) > 0,
-    )
-
-    slug = slugify_branch_description(description)
+    resolved_description = resolve_branch_description(description)
+    slug = slugify_branch_description(resolved_description)
     branch_name = f"{type_str}/{slug}"
 
     print_color("\nBranch name preview:", "blue")
     print(branch_name)
 
-    confirm = input("\nConfirm branch creation? [Y/n] ").strip().lower()
-    if confirm not in ("", "y", "yes"):
-        print_color("Branch creation cancelled.", "yellow")
-        sys.exit(0)
+    confirm_action("\nConfirm branch creation? [Y/n] ")
 
     try:
         result = subprocess.run(
@@ -222,25 +327,31 @@ def create_branch():
             print(result.stdout)
         if result.stderr:
             print(result.stderr)
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError as error:
         print_color("\n✗ Error creating branch:", "red")
-        if e.stderr:
-            print_color(e.stderr, "red")
+        if error.stderr:
+            print_color(error.stderr, "red")
         else:
-            print_color(str(e), "red")
+            print_color(str(error), "red")
         sys.exit(1)
     except KeyboardInterrupt:
         print_color("\nOperation cancelled by user.", "yellow")
         sys.exit(1)
 
 
-def print_usage():
+def print_usage() -> None:
     print_color("Usage:", "blue")
-    print("  grove -c <file1> <file2> ...")
+    print("  grove -c <files...>")
+    print("  grove -c <files...> <type-number> <title> [description]")
     print("  grove -b")
+    print("  grove -b <type-number> [description]")
+    print("\nExamples:")
+    print("  grove -c src/main.py README.md 1 titulo-exemplo descricao-exemplo")
+    print('  grove -c src/main.py 1 "titulo exemplo" "descricao exemplo"')
+    print("  grove -b 1 add-login-page")
 
 
-def main():
+def main() -> None:
     if not is_git_repository():
         print_color("Error: Not a git repository.", "red")
         sys.exit(1)
@@ -251,20 +362,14 @@ def main():
         sys.exit(1)
 
     mode = sys.argv[1]
+    extra_args = sys.argv[2:]
 
     if mode == "-c":
-        if len(sys.argv) < 3:
-            print_color("Error: No files specified for commit mode.", "red")
-            print_usage()
-            sys.exit(1)
-        files_to_add = sys.argv[2:]
-        create_commit(files_to_add)
+        files_to_add, commit_type, title, description = parse_commit_arguments(extra_args)
+        create_commit(files_to_add, commit_type, title, description)
     elif mode == "-b":
-        if len(sys.argv) != 2:
-            print_color("Error: Branch mode does not accept additional arguments.", "red")
-            print_usage()
-            sys.exit(1)
-        create_branch()
+        branch_type, description = parse_branch_arguments(extra_args)
+        create_branch(branch_type, description)
     else:
         print_color(f"Error: Unknown flag '{mode}'.", "red")
         print_usage()
