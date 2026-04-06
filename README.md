@@ -68,7 +68,7 @@ You can also install Grove manually.
 Main file:
 
 ```txt
-https://github.com/viniciusnevescosta/grove/blob/main/grove.py
+https://github.com/viniciusnevescosta/grove/blob/main/main.py
 ```
 
 ### Windows
