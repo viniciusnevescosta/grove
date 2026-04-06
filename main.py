@@ -1,3 +1,4 @@
+import importlib
 import re
 import shlex
 import subprocess
@@ -44,6 +45,16 @@ BRANCH_TYPES: Dict[int, Tuple[str, str]] = {
 }
 
 
+def enable_line_editing() -> None:
+    if sys.platform.startswith("win"):
+        return
+
+    try:
+        importlib.import_module("readline")
+    except ImportError:
+        pass
+
+
 def print_color(text: str, color: str = "reset") -> None:
     print(f"{COLORS.get(color, '')}{text}{COLORS['reset']}")
 
@@ -75,21 +86,6 @@ def is_git_repository() -> bool:
         return False
 
 
-def has_staged_changes() -> bool:
-    try:
-        subprocess.run(
-            ["git", "diff", "--cached", "--quiet"],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        return False
-    except subprocess.CalledProcessError as error:
-        if error.returncode == 1:
-            return True
-        raise
-
-
 def format_commit_message(type_str: str, title: str, description: str) -> str:
     commit_message = f"[{type_str}] {title}"
     if description:
@@ -110,7 +106,7 @@ def slugify_branch_description(description: str) -> str:
 def prompt_for_files() -> List[str]:
     while True:
         raw_files = get_valid_input(
-            "Enter the files to stage (separate with spaces): ",
+            "Enter the files to commit (separate with spaces): ",
             lambda x: bool(x.strip()),
         )
         try:
@@ -168,11 +164,26 @@ def parse_branch_arguments(args: List[str]) -> Tuple[Optional[int], Optional[str
     return branch_type, description
 
 
+def files_have_pending_changes(files_to_add: List[str]) -> bool:
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain", "--", *files_to_add],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        return bool(result.stdout.strip())
+    except subprocess.CalledProcessError as error:
+        print_color("Error while checking file changes.", "red")
+        if error.stderr:
+            print_color(error.stderr, "red")
+        sys.exit(1)
+
+
 def stage_files(files_to_add: List[str]) -> None:
     try:
-        print_color(f"Staging files: {', '.join(files_to_add)}", "blue")
         subprocess.run(
-            ["git", "add", *files_to_add],
+            ["git", "add", "--", *files_to_add],
             check=True,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
@@ -182,12 +193,20 @@ def stage_files(files_to_add: List[str]) -> None:
         print_color(f"Error staging files: {error.stderr}", "red")
         sys.exit(1)
 
-    if not has_staged_changes():
-        print_color(
-            "Error: No changes staged after adding files. Check if files have modifications.",
-            "red",
+
+def has_staged_changes_for_files(files_to_add: List[str]) -> bool:
+    try:
+        subprocess.run(
+            ["git", "diff", "--cached", "--quiet", "--", *files_to_add],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
-        sys.exit(1)
+        return False
+    except subprocess.CalledProcessError as error:
+        if error.returncode == 1:
+            return True
+        raise
 
 
 def get_current_branch() -> str:
@@ -310,11 +329,9 @@ def resolve_branch_description(description: Optional[str]) -> str:
     )
 
 
-def confirm_action(message: str) -> None:
+def confirm_action(message: str) -> bool:
     confirm = input(message).strip().lower()
-    if confirm not in ("", "y", "yes"):
-        print_color("Operation cancelled.", "yellow")
-        sys.exit(0)
+    return confirm in ("", "y", "yes")
 
 
 def create_commit(
@@ -326,7 +343,12 @@ def create_commit(
     if not files_to_add:
         files_to_add = prompt_for_files()
 
-    stage_files(files_to_add)
+    if not files_have_pending_changes(files_to_add):
+        print_color(
+            "Error: The provided files do not have pending changes to commit.",
+            "red",
+        )
+        sys.exit(1)
 
     resolved_commit_type = resolve_commit_type(commit_type)
     type_str, _ = COMMIT_TYPES[resolved_commit_type]
@@ -336,23 +358,43 @@ def create_commit(
 
     full_message = format_commit_message(type_str, resolved_title, resolved_description)
 
+    print_color("\nFiles to commit:", "blue")
+    for file_path in files_to_add:
+        print(f"- {file_path}")
+
     print_color("\nCommit message preview:", "blue")
     print(full_message)
 
-    confirm_action("\nConfirm commit? [Y/n] ")
+    if not confirm_action("\nConfirm commit? [Y/n] "):
+        print_color("Operation cancelled.", "yellow")
+        sys.exit(0)
+
+    stage_files(files_to_add)
+
+    if not has_staged_changes_for_files(files_to_add):
+        print_color(
+            "Error: No staged changes were found for the provided files after git add.",
+            "red",
+        )
+        sys.exit(1)
 
     try:
         result = subprocess.run(
-            ["git", "commit", "-m", full_message],
+            ["git", "commit", "--only", "-m", full_message, "--", *files_to_add],
             check=True,
             text=True,
             capture_output=True,
         )
         print_color("\n✓ Commit created successfully!", "green")
         print(result.stdout)
+        if result.stderr:
+            print(result.stderr)
     except subprocess.CalledProcessError as error:
         print_color("\n✗ Error creating commit:", "red")
-        print_color(error.stderr, "red")
+        if error.stderr:
+            print_color(error.stderr, "red")
+        else:
+            print_color(str(error), "red")
         sys.exit(1)
     except KeyboardInterrupt:
         print_color("\nOperation cancelled by user.", "yellow")
@@ -370,7 +412,9 @@ def create_branch(branch_type: Optional[int], description: Optional[str]) -> Non
     print_color("\nBranch name preview:", "blue")
     print(branch_name)
 
-    confirm_action("\nConfirm branch creation? [Y/n] ")
+    if not confirm_action("\nConfirm branch creation? [Y/n] "):
+        print_color("Operation cancelled.", "yellow")
+        sys.exit(0)
 
     try:
         result = subprocess.run(
@@ -464,7 +508,7 @@ def print_usage() -> None:
     print("  grove pull")
     print("\nExamples:")
     print("  grove -c src/main.py README.md")
-    print("  grove -c src/main.py README.md 1 title-exemple description-example")
+    print("  grove -c src/main.py README.md 1 title-example description-example")
     print('  grove -c src/main.py 1 "title" "description"')
     print("  grove -b 1 add-login-page")
     print("  grove push")
@@ -472,6 +516,8 @@ def print_usage() -> None:
 
 
 def main() -> None:
+    enable_line_editing()
+
     if not is_git_repository():
         print_color("Error: Not a git repository.", "red")
         sys.exit(1)
