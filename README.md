@@ -4,8 +4,8 @@ Semantic Git helper for commits, branches, push, and pull.
 
 Grove is based on the ideas behind Conventional Commits and Conventional Branch.
 
-- Conventional Commits: https://www.conventionalcommits.org/en/v1.0.0/
-- Conventional Branch: https://conventional-branch.github.io/
+- [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) 
+- [Conventional Branch](https://conventional-branch.github.io/) 
 
 ## Index
 
@@ -43,7 +43,7 @@ You can install Grove manually or run `Install.py`.
 
 ### Using install.py
 
-`Install.py` detects the user's operating system and can install or uninstall Grove.
+`Install.py` detects the user's operating system and can install, update or uninstall Grove.
 
 Run:
 
@@ -193,6 +193,8 @@ grove -b 1 add-login-page
 grove -b 2 fix-header-bug
 ```
 
+- Use `/br` in commit descriptions to create line breaks
+
 ### Push
 
 ```bash
@@ -246,14 +248,13 @@ Grove supports semantic commit selection through a numeric menu.
 Example output:
 
 ```txt
-[feat] ✨ add login page
+[feat] add login page
 ```
 
 ## Notes
 
 - Branch descriptions are normalized to slug format
 - Commit descriptions are optional
-- Use `/br` in commit descriptions to create line breaks
 - `grove push` uses the current branch name
 - `grove pull` pulls from the branch with the same name on `origin`
 - `Install.py` supports install and uninstall
