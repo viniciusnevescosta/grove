@@ -4,8 +4,8 @@ Semantic Git helper for commits, branches, push, and pull.
 
 Grove is based on the ideas behind Conventional Commits and Conventional Branch.
 
-- [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) 
-- [Conventional Branch](https://conventional-branch.github.io/) 
+- [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- [Conventional Branch](https://conventional-branch.github.io/)
 
 ## Index
 
@@ -18,6 +18,7 @@ Grove is based on the ideas behind Conventional Commits and Conventional Branch.
   - [Linux](#linux)
 - [Usage](#usage)
   - [Commit](#commit)
+  - [Commit and push](#commit-and-push)
   - [Branch](#branch)
   - [Push](#push)
   - [Pull](#pull)
@@ -31,9 +32,10 @@ Grove is based on the ideas behind Conventional Commits and Conventional Branch.
 - Interactive semantic branches
 - Inline command support
 - Partial input completion
-- Immediate `git add` when using `grove -c <files...>`
-- Pushes the current local branch to the current remote branch
-- Pulls the current remote branch into the current local branch
+- Stages only the files explicitly provided for commit
+- Optional commit + push flow with `-cp` or `-c -p`
+- Pushes the current local branch to the matching remote branch
+- Pulls the matching remote branch into the current local branch
 - Automatically switches to the new branch with `git checkout -b`
 
 ## Installation
@@ -151,12 +153,32 @@ grove -c src/main.py README.md 1 add-login-page
 grove -c src/main.py 2 fix-header-bug "fix mobile navigation overlap"
 ```
 
-When you run `grove -c <files...>`, Grove immediately stages the provided files with `git add` before continuing the commit flow.
+After confirmation, Grove stages only the provided files, creates the commit, and keeps the process interactive when arguments are missing.
 
 #### Notes
 
 - Commit descriptions are optional
 - Use `/br` in commit descriptions to create line breaks
+
+### Commit and push
+
+```bash
+grove -cp <files...>
+grove -cp <files...> <type-number> <title> [description]
+
+grove -c -p <files...>
+grove -c -p <files...> <type-number> <title> [description]
+```
+
+Examples:
+
+```bash
+grove -cp src/main.py README.md
+grove -cp src/main.py README.md 1 add-login-page
+grove -c -p src/main.py 2 fix-header-bug "fix mobile navigation overlap"
+```
+
+After the commit succeeds, Grove automatically pushes the current local branch to the corresponding remote branch. If the branch does not yet have an upstream, Grove uses `git push -u origin <current-branch>`.
 
 ### Branch
 
@@ -183,11 +205,11 @@ grove -b 2 fix-header-bug
 grove push
 ```
 
-Pushes all local changes from the current branch to the current remote branch.
+Pushes the current local branch to the matching branch on `origin`.
 
 #### Notes
 
-- `grove push` uses the current branch name
+- If no upstream is configured yet, Grove uses `git push -u origin <current-branch>`
 
 ### Pull
 
@@ -195,7 +217,7 @@ Pushes all local changes from the current branch to the current remote branch.
 grove pull
 ```
 
-Pulls all remote changes from the current remote branch into the current local branch.
+Pulls remote changes from the matching branch on `origin` into the current local branch.
 
 #### Notes
 
@@ -207,9 +229,12 @@ If you provide only part of the command, Grove completes the remaining steps int
 
 Examples:
 
-- if you provide files only, it stages them and asks for the commit type, title, and description
+- if you provide files only, it asks for the commit type, title, and description
 - if you provide files and type, it asks only for the missing title and description
 - if you provide branch type only, it asks only for the description
+- if you use `-cp` or `-c -p`, Grove commits first and then pushes automatically
+
+All `git add` and `git commit` actions only happen after the final confirmation.
 
 ## Branch types
 
