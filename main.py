@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import importlib
 import re
 import shlex
@@ -55,8 +56,10 @@ def enable_line_editing() -> None:
         pass
 
 
+
 def print_color(text: str, color: str = "reset") -> None:
     print(f"{COLORS.get(color, '')}{text}{COLORS['reset']}")
+
 
 
 def get_valid_input(prompt: str, validation_func, optional: bool = False) -> str:
@@ -73,6 +76,7 @@ def get_valid_input(prompt: str, validation_func, optional: bool = False) -> str
             sys.exit(1)
 
 
+
 def is_git_repository() -> bool:
     try:
         subprocess.run(
@@ -86,12 +90,14 @@ def is_git_repository() -> bool:
         return False
 
 
+
 def format_commit_message(type_str: str, title: str, description: str) -> str:
     commit_message = f"[{type_str}] {title}"
     if description:
         formatted_description = description.replace("/br", "\n")
         commit_message += f"\n\n{formatted_description}"
     return commit_message
+
 
 
 def slugify_branch_description(description: str) -> str:
@@ -101,6 +107,7 @@ def slugify_branch_description(description: str) -> str:
     value = re.sub(r"-+", "-", value)
     value = value.strip("-/")
     return value
+
 
 
 def prompt_for_files() -> List[str]:
@@ -121,6 +128,7 @@ def prompt_for_files() -> List[str]:
         print_color("Please provide at least one file.", "yellow")
 
 
+
 def find_first_valid_type_index(
     args: List[str],
     valid_types: Dict[int, Tuple[str, str]],
@@ -129,6 +137,21 @@ def find_first_valid_type_index(
         if value.isdigit() and int(value) in valid_types:
             return index
     return None
+
+
+
+def extract_push_flag(args: List[str]) -> Tuple[List[str], bool]:
+    filtered_args: List[str] = []
+    push_after_commit = False
+
+    for value in args:
+        if value == "-p":
+            push_after_commit = True
+            continue
+        filtered_args.append(value)
+
+    return filtered_args, push_after_commit
+
 
 
 def parse_commit_arguments(args: List[str]) -> Tuple[List[str], Optional[int], Optional[str], Optional[str]]:
@@ -145,6 +168,7 @@ def parse_commit_arguments(args: List[str]) -> Tuple[List[str], Optional[int], O
     description = " ".join(metadata[2:]) if len(metadata) >= 3 else None
 
     return files, commit_type, title, description
+
 
 
 def parse_branch_arguments(args: List[str]) -> Tuple[Optional[int], Optional[str]]:
@@ -164,6 +188,7 @@ def parse_branch_arguments(args: List[str]) -> Tuple[Optional[int], Optional[str
     return branch_type, description
 
 
+
 def files_have_pending_changes(files_to_add: List[str]) -> bool:
     try:
         result = subprocess.run(
@@ -180,6 +205,7 @@ def files_have_pending_changes(files_to_add: List[str]) -> bool:
         sys.exit(1)
 
 
+
 def stage_files(files_to_add: List[str]) -> None:
     try:
         subprocess.run(
@@ -192,6 +218,7 @@ def stage_files(files_to_add: List[str]) -> None:
     except subprocess.CalledProcessError as error:
         print_color(f"Error staging files: {error.stderr}", "red")
         sys.exit(1)
+
 
 
 def has_staged_changes_for_files(files_to_add: List[str]) -> bool:
@@ -207,6 +234,7 @@ def has_staged_changes_for_files(files_to_add: List[str]) -> bool:
         if error.returncode == 1:
             return True
         raise
+
 
 
 def get_current_branch() -> str:
@@ -229,6 +257,7 @@ def get_current_branch() -> str:
         sys.exit(1)
 
 
+
 def ensure_origin_remote() -> None:
     try:
         subprocess.run(
@@ -245,6 +274,7 @@ def ensure_origin_remote() -> None:
         sys.exit(1)
 
 
+
 def has_upstream() -> bool:
     try:
         subprocess.run(
@@ -257,6 +287,7 @@ def has_upstream() -> bool:
         return True
     except subprocess.CalledProcessError:
         return False
+
 
 
 def resolve_commit_type(commit_type: Optional[int]) -> int:
@@ -275,6 +306,7 @@ def resolve_commit_type(commit_type: Optional[int]) -> int:
     )
 
 
+
 def resolve_branch_type(branch_type: Optional[int]) -> int:
     if branch_type is not None:
         return branch_type
@@ -291,6 +323,7 @@ def resolve_branch_type(branch_type: Optional[int]) -> int:
     )
 
 
+
 def resolve_commit_title(title: Optional[str]) -> str:
     if title is not None:
         if 0 < len(title) <= 72:
@@ -304,6 +337,7 @@ def resolve_commit_title(title: Optional[str]) -> str:
     )
 
 
+
 def resolve_commit_description(description: Optional[str]) -> str:
     if description is not None:
         return description
@@ -313,6 +347,7 @@ def resolve_commit_description(description: Optional[str]) -> str:
         lambda x: True,
         optional=True,
     )
+
 
 
 def resolve_branch_description(description: Optional[str]) -> str:
@@ -329,9 +364,11 @@ def resolve_branch_description(description: Optional[str]) -> str:
     )
 
 
+
 def confirm_action(message: str) -> bool:
     confirm = input(message).strip().lower()
     return confirm in ("", "y", "yes")
+
 
 
 def create_commit(
@@ -339,6 +376,7 @@ def create_commit(
     commit_type: Optional[int],
     title: Optional[str],
     description: Optional[str],
+    push_after_commit: bool = False,
 ) -> None:
     if not files_to_add:
         files_to_add = prompt_for_files()
@@ -364,6 +402,9 @@ def create_commit(
 
     print_color("\nCommit message preview:", "blue")
     print(full_message)
+
+    if push_after_commit:
+        print_color("\nPush after commit: enabled", "blue")
 
     if not confirm_action("\nConfirm commit? [Y/n] "):
         print_color("Operation cancelled.", "yellow")
@@ -399,6 +440,11 @@ def create_commit(
     except KeyboardInterrupt:
         print_color("\nOperation cancelled by user.", "yellow")
         sys.exit(1)
+
+    if push_after_commit:
+        print_color("\nCommit finished. Starting push...", "blue")
+        push_current_branch()
+
 
 
 def create_branch(branch_type: Optional[int], description: Optional[str]) -> None:
@@ -440,6 +486,7 @@ def create_branch(branch_type: Optional[int], description: Optional[str]) -> Non
         sys.exit(1)
 
 
+
 def push_current_branch() -> None:
     ensure_origin_remote()
     branch = get_current_branch()
@@ -471,6 +518,7 @@ def push_current_branch() -> None:
         sys.exit(1)
 
 
+
 def pull_current_branch() -> None:
     ensure_origin_remote()
     branch = get_current_branch()
@@ -498,21 +546,29 @@ def pull_current_branch() -> None:
         sys.exit(1)
 
 
+
 def print_usage() -> None:
     print_color("Usage:", "blue")
     print("  grove -c <files...>")
+    print("  grove -c -p <files...>")
+    print("  grove -cp <files...>")
     print("  grove -c <files...> <type-number> <title> [description]")
+    print("  grove -c -p <files...> <type-number> <title> [description]")
+    print("  grove -cp <files...> <type-number> <title> [description]")
     print("  grove -b")
     print("  grove -b <type-number> [description]")
     print("  grove push")
     print("  grove pull")
     print("\nExamples:")
     print("  grove -c src/main.py README.md")
+    print("  grove -c -p src/main.py README.md")
+    print("  grove -cp src/main.py README.md")
     print("  grove -c src/main.py README.md 1 title-example description-example")
-    print('  grove -c src/main.py 1 "title" "description"')
+    print('  grove -cp src/main.py 1 "title" "description"')
     print("  grove -b 1 add-login-page")
     print("  grove push")
     print("  grove pull")
+
 
 
 def main() -> None:
@@ -531,8 +587,12 @@ def main() -> None:
     extra_args = sys.argv[2:]
 
     if mode == "-c":
+        commit_args, push_after_commit = extract_push_flag(extra_args)
+        files_to_add, commit_type, title, description = parse_commit_arguments(commit_args)
+        create_commit(files_to_add, commit_type, title, description, push_after_commit)
+    elif mode == "-cp":
         files_to_add, commit_type, title, description = parse_commit_arguments(extra_args)
-        create_commit(files_to_add, commit_type, title, description)
+        create_commit(files_to_add, commit_type, title, description, True)
     elif mode == "-b":
         branch_type, description = parse_branch_arguments(extra_args)
         create_branch(branch_type, description)
