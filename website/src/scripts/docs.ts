@@ -31,6 +31,21 @@ export const docsContent = {
   ] as const,
   features: [
     {
+      title: 'Strict Conventional Commit header',
+      description:
+        'Builds commit messages as `<type>[optional scope][optional !]: <description>` instead of using a custom Grove-specific header.',
+    },
+    {
+      title: 'Interactive scope and breaking flag',
+      description:
+        'Lets you add an optional scope and mark breaking changes with `!` while keeping the flow guided and fast.',
+    },
+    {
+      title: 'Custom commit and branch types',
+      description:
+        'The last menu option is `Custom`, so you can create headers like `system(api)!: test` and branches like `system/observability`.',
+    },
+    {
       title: 'Interactive commits',
       description:
         'Guides you through semantic commits when arguments are missing and keeps the flow fast when they are present.',
@@ -39,11 +54,6 @@ export const docsContent = {
       title: 'Interactive branches',
       description:
         'Creates semantic branch names from a guided prompt and switches to the branch automatically.',
-    },
-    {
-      title: 'Inline command support',
-      description:
-        'Accepts partial or complete commands directly from the shell without forcing a fully interactive flow every time.',
     },
     {
       title: 'Explicit staging only',
@@ -65,74 +75,75 @@ export const docsContent = {
       description:
         'All `git add` and `git commit` actions happen only after the final confirmation prompt.',
     },
-    {
-      title: 'Branch checkout included',
-      description:
-        'New branches are created with the expected semantic format and opened immediately with `git checkout -b`.',
-    },
   ] as const,
   branchTypes: [
     ['feat', 'For new features.'],
     ['fix', 'For bug fixes.'],
     ['hotfix', 'For urgent fixes.'],
     ['release', 'For release preparation.'],
-    ['chore', 'For non-code tasks such as dependency or docs updates.'],
+    ['chore', 'For maintenance tasks.'],
+    ['custom', 'Provide your own branch type, such as `system`.'],
   ] as const,
   commitTypes: [
-    ['feat', 'New feature added to the application.'],
-    ['fix', 'Bug fix in the codebase.'],
-    ['docs', 'Documentation added or updated.'],
-    ['test', 'Tests added or modified.'],
-    ['build', 'Changes to build process or dependencies.'],
-    ['perf', 'Performance optimization.'],
-    ['style', 'Formatting or style improvements without logic changes.'],
-    ['refactor', 'Code restructuring without changing functionality.'],
-    ['chore', 'Routine maintenance and non-functional changes.'],
-    ['ci', 'Changes to CI/CD configuration or scripts.'],
-    ['revert', 'Reverting previous changes.'],
-    ['security', 'Security-related improvements or fixes.'],
-    ['wip', 'Temporary work in progress commit.'],
-    ['raw', 'Updates to raw datasets or data files.'],
-    ['cleanup', 'Code cleanup or dead code removal.'],
-    ['remove', 'Files or code were removed.'],
-    ['locale', 'Translation or localization updates.'],
+    ['feat', 'Adds a new feature.'],
+    ['fix', 'Represents a bug fix.'],
+    ['docs', 'Documentation changes.'],
+    ['test', 'Test additions or updates.'],
+    ['build', 'Build system or dependency changes.'],
+    ['perf', 'Performance improvements.'],
+    ['style', 'Formatting or style-only changes.'],
+    ['refactor', 'Code restructuring without changing behavior.'],
+    ['chore', 'Routine maintenance tasks.'],
+    ['ci', 'CI/CD configuration changes.'],
+    ['revert', 'Reverts a previous change.'],
+    ['security', 'Security-related changes.'],
+    ['wip', 'Work in progress.'],
+    ['raw', 'Raw data updates.'],
+    ['cleanup', 'Cleanup or dead code removal.'],
+    ['remove', 'Files or code removals.'],
+    ['locale', 'Localization updates.'],
     ['access', 'Accessibility improvements.'],
     ['ux', 'User interface or user experience changes.'],
-    ['break', 'Backward-incompatible breaking change.'],
+    ['custom', 'Provide your own type, such as `system`.'],
   ] as const,
   installPyUsage: `python install.py
 python install.py install
 python install.py update
 python install.py uninstall`,
   windowsBat: `@echo off
-python C:\path\to\main.py %*`,
+python C:\\path\\to\\main.py %*`,
   unixInstall: `#!/usr/bin/env python3
 
 chmod +x grove
 mv grove ~/.local/bin/grove`,
   commitUsage: `grove -c <files...>
-grove -c <files...> <type-number> <title> [description]`,
-  commitExamples: `grove -c src/main.py README.md
-grove -c src/main.py README.md 1 add-login-page
-grove -c src/main.py 2 fix-header-bug "fix mobile navigation overlap"`,
+grove -c <files...> <type-number> <description> [body]`,
+  commitExamples: `# standard type
+feat(parser): add array support
+
+# breaking change
+feat(api)!: remove legacy endpoint
+
+# custom type
+system(api)!: change auth contract`,
   commitPushUsage: `grove -cp <files...>
-grove -cp <files...> <type-number> <title> [description]
+grove -cp <files...> <type-number> <description> [body]
 
 grove -c -p <files...>
-grove -c -p <files...> <type-number> <title> [description]`,
+grove -c -p <files...> <type-number> <description> [body]`,
   commitPushExamples: `grove -cp src/main.py README.md
-grove -cp src/main.py README.md 1 add-login-page
-grove -c -p src/main.py 2 fix-header-bug "fix mobile navigation overlap"`,
+grove -cp src/main.py README.md 1 "add login page"
+grove -c -p src/main.py 20 "change auth contract" "BREAKING CHANGE: token payload changed"`,
   branchUsage: `grove -b
 grove -b <type-number> [description]`,
   branchExamples: `grove -b
 grove -b 1 add-login-page
-grove -b 2 fix-header-bug`,
+grove -b 6 observability-pipeline`,
   branchFormat: `<type>/<description>`,
-  branchExample: `feat/add-login-page`,
-  commitOutput: `[feat] add login page`,
+  branchExample: `system/observability-pipeline`,
+  commitOutput: `system(api)!: change auth contract`,
   terminalPreview: `$ grove -c src/main.py README.md
-$ grove -cp src/main.py 1 add-login-page
-$ grove -b 2 fix-header-bug
+$ grove -cp src/main.py 20 "change auth contract"
+$ grove -b 6 observability-pipeline
 $ grove push`,
 } as const;

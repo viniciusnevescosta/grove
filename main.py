@@ -15,35 +15,39 @@ COLORS = {
 }
 
 COMMIT_TYPES: Dict[int, Tuple[str, str]] = {
-    1: ("feat", "✨ New feature - A new feature was added to the application"),
-    2: ("fix", "🐛 Bug fix - A bug was fixed in the codebase"),
-    3: ("docs", "📚 Documentation - Documentation was added or updated"),
-    4: ("test", "🧪 Tests - Tests were added or modified"),
-    5: ("build", "➕ Build system - Changes to build process or dependencies"),
-    6: ("perf", "⚡ Performance - Performance optimization was implemented"),
-    7: ("style", "🎨 Code style - Code formatting or style improvements (no logic changes)"),
-    8: ("refactor", "♻️ Refactoring - Code restructuring without changing functionality"),
-    9: ("chore", "🔧 Chores - Routine tasks/maintenance (non-functional changes)"),
-    10: ("ci", "🧱 CI/CD - Changes to CI/CD configuration or scripts"),
-    11: ("revert", "⏪ Revert - Reverting previous changes"),
-    12: ("security", "🔒 Security - Security-related improvements or fixes"),
-    13: ("wip", "🚧 WIP - Work in progress (temporary commit)"),
-    14: ("raw", "🗃️ Raw data - Updates to raw datasets or data files"),
-    15: ("cleanup", "🧹 Cleanup - Code cleanup or dead code removal"),
-    16: ("remove", "🗑️ Removal - Files or code were removed"),
-    17: ("locale", "🌐 Localization - Translation or localization updates"),
-    18: ("access", "♿ Accessibility - Accessibility improvements"),
-    19: ("ux", "💄 UI/UX - User interface/user experience changes"),
-    20: ("break", "💥 Breaking change - Changes that break backward compatibility"),
+    1: ("feat", "✨ feat - A new feature was added"),
+    2: ("fix", "🐛 fix - A bug was fixed"),
+    3: ("docs", "📚 docs - Documentation was added or updated"),
+    4: ("test", "🧪 test - Tests were added or modified"),
+    5: ("build", "➕ build - Build system or dependency changes"),
+    6: ("perf", "⚡ perf - Performance improvements"),
+    7: ("style", "🎨 style - Formatting or style-only changes"),
+    8: ("refactor", "♻️ refactor - Code restructuring without behavior changes"),
+    9: ("chore", "🔧 chore - Maintenance and routine tasks"),
+    10: ("ci", "🧱 ci - CI/CD configuration or script changes"),
+    11: ("revert", "⏪ revert - Reverting previous changes"),
+    12: ("security", "🔒 security - Security-related changes"),
+    13: ("wip", "🚧 wip - Work in progress"),
+    14: ("raw", "🗃️ raw - Raw data or dataset updates"),
+    15: ("cleanup", "🧹 cleanup - Cleanup or dead code removal"),
+    16: ("remove", "🗑️ remove - Files or code were removed"),
+    17: ("locale", "🌐 locale - Localization updates"),
+    18: ("access", "♿ access - Accessibility improvements"),
+    19: ("ux", "💄 ux - User interface or experience changes"),
+    20: ("custom", "🧩 Custom - Provide your own Conventional Commit type"),
 }
 
 BRANCH_TYPES: Dict[int, Tuple[str, str]] = {
-    1: ("feat", "✨ Feature - For new features"),
-    2: ("fix", "🐛 Fix - For bug fixes"),
-    3: ("hotfix", "🚑 Hotfix - For urgent fixes"),
-    4: ("release", "🚀 Release - For release preparation"),
-    5: ("chore", "🔧 Chore - For non-code tasks like dependency/docs updates"),
+    1: ("feat", "✨ feat - For new features"),
+    2: ("fix", "🐛 fix - For bug fixes"),
+    3: ("hotfix", "🚑 hotfix - For urgent fixes"),
+    4: ("release", "🚀 release - For release preparation"),
+    5: ("chore", "🔧 chore - For maintenance tasks"),
+    6: ("custom", "🧩 Custom - Provide your own branch type"),
 }
+
+CUSTOM_COMMIT_TYPE_KEY = max(COMMIT_TYPES)
+CUSTOM_BRANCH_TYPE_KEY = max(BRANCH_TYPES)
 
 
 def enable_line_editing() -> None:
@@ -77,6 +81,12 @@ def get_valid_input(prompt: str, validation_func, optional: bool = False) -> str
 
 
 
+def confirm_action(message: str) -> bool:
+    confirm = input(message).strip().lower()
+    return confirm in ("", "y", "yes")
+
+
+
 def is_git_repository() -> bool:
     try:
         subprocess.run(
@@ -91,12 +101,43 @@ def is_git_repository() -> bool:
 
 
 
-def format_commit_message(type_str: str, title: str, description: str) -> str:
-    commit_message = f"[{type_str}] {title}"
-    if description:
-        formatted_description = description.replace("/br", "\n")
-        commit_message += f"\n\n{formatted_description}"
-    return commit_message
+def normalize_multiline_text(value: str) -> str:
+    return value.replace("/br", "\n").strip()
+
+
+
+def is_valid_custom_commit_type(value: str) -> bool:
+    return bool(re.fullmatch(r"[A-Za-z][A-Za-z0-9-]*", value.strip()))
+
+
+
+def is_valid_scope(value: str) -> bool:
+    return bool(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]*", value.strip()))
+
+
+
+def is_valid_custom_branch_type(value: str) -> bool:
+    return bool(re.fullmatch(r"[A-Za-z][A-Za-z0-9-]*", value.strip()))
+
+
+
+def format_commit_message(
+    commit_type: str,
+    description: str,
+    body: str,
+    scope: str = "",
+    breaking_change: bool = False,
+) -> str:
+    header = commit_type
+    if scope:
+        header += f"({scope})"
+    if breaking_change:
+        header += "!"
+    header += f": {description}"
+
+    if body:
+        return f"{header}\n\n{body}"
+    return header
 
 
 
@@ -107,6 +148,14 @@ def slugify_branch_description(description: str) -> str:
     value = re.sub(r"-+", "-", value)
     value = value.strip("-/")
     return value
+
+
+
+def normalize_branch_type(value: str) -> str:
+    value = value.strip().lower()
+    value = re.sub(r"[^a-z0-9-]", "-", value)
+    value = re.sub(r"-+", "-", value)
+    return value.strip("-")
 
 
 
@@ -164,10 +213,10 @@ def parse_commit_arguments(args: List[str]) -> Tuple[List[str], Optional[int], O
     metadata = args[type_index:]
 
     commit_type = int(metadata[0]) if metadata else None
-    title = metadata[1] if len(metadata) >= 2 else None
-    description = " ".join(metadata[2:]) if len(metadata) >= 3 else None
+    description = metadata[1] if len(metadata) >= 2 else None
+    body = " ".join(metadata[2:]) if len(metadata) >= 3 else None
 
-    return files, commit_type, title, description
+    return files, commit_type, description, body
 
 
 
@@ -324,28 +373,71 @@ def resolve_branch_type(branch_type: Optional[int]) -> int:
 
 
 
-def resolve_commit_title(title: Optional[str]) -> str:
-    if title is not None:
-        if 0 < len(title) <= 72:
-            return title
-        print_color("Error: Commit title must have between 1 and 72 characters.", "red")
-        sys.exit(1)
+def resolve_commit_type_value(selected_type: int) -> str:
+    type_str, _ = COMMIT_TYPES[selected_type]
+    if selected_type != CUSTOM_COMMIT_TYPE_KEY:
+        return type_str
 
     return get_valid_input(
-        "Enter the commit title (required, max 72 chars): ",
-        lambda x: 0 < len(x) <= 72,
+        "Enter the custom commit type (example: system): ",
+        is_valid_custom_commit_type,
+    ).lower()
+
+
+
+def resolve_branch_type_value(selected_type: int) -> str:
+    type_str, _ = BRANCH_TYPES[selected_type]
+    if selected_type != CUSTOM_BRANCH_TYPE_KEY:
+        return type_str
+
+    custom_type = get_valid_input(
+        "Enter the custom branch type (example: system): ",
+        is_valid_custom_branch_type,
     )
+    return normalize_branch_type(custom_type)
+
+
+
+def resolve_commit_scope() -> str:
+    return get_valid_input(
+        "Enter the optional scope (press Enter to skip): ",
+        lambda x: is_valid_scope(x) or x == "",
+        optional=True,
+    )
+
+
+
+def resolve_breaking_change() -> bool:
+    response = input("Is this a breaking change? [y/N] ").strip().lower()
+    return response in ("y", "yes")
 
 
 
 def resolve_commit_description(description: Optional[str]) -> str:
     if description is not None:
-        return description
+        normalized = description.strip()
+        if normalized:
+            return normalized
+        print_color("Error: Commit description cannot be empty.", "red")
+        sys.exit(1)
 
     return get_valid_input(
-        "Enter the commit description (optional, use '/br' for new lines, press 'Enter' to skip): ",
-        lambda x: True,
-        optional=True,
+        "Enter the commit description: ",
+        lambda x: bool(x.strip()),
+    )
+
+
+
+def resolve_commit_body(body: Optional[str]) -> str:
+    if body is not None:
+        return normalize_multiline_text(body)
+
+    return normalize_multiline_text(
+        get_valid_input(
+            "Enter the optional commit body or footer text (use '/br' for new lines, press Enter to skip): ",
+            lambda x: True,
+            optional=True,
+        )
     )
 
 
@@ -365,17 +457,11 @@ def resolve_branch_description(description: Optional[str]) -> str:
 
 
 
-def confirm_action(message: str) -> bool:
-    confirm = input(message).strip().lower()
-    return confirm in ("", "y", "yes")
-
-
-
 def create_commit(
     files_to_add: List[str],
     commit_type: Optional[int],
-    title: Optional[str],
     description: Optional[str],
+    body: Optional[str],
     push_after_commit: bool = False,
 ) -> None:
     if not files_to_add:
@@ -388,13 +474,20 @@ def create_commit(
         )
         sys.exit(1)
 
-    resolved_commit_type = resolve_commit_type(commit_type)
-    type_str, _ = COMMIT_TYPES[resolved_commit_type]
-
-    resolved_title = resolve_commit_title(title)
+    selected_commit_type = resolve_commit_type(commit_type)
+    type_str = resolve_commit_type_value(selected_commit_type)
+    scope = resolve_commit_scope()
+    breaking_change = resolve_breaking_change()
     resolved_description = resolve_commit_description(description)
+    resolved_body = resolve_commit_body(body)
 
-    full_message = format_commit_message(type_str, resolved_title, resolved_description)
+    full_message = format_commit_message(
+        commit_type=type_str,
+        description=resolved_description,
+        body=resolved_body,
+        scope=scope,
+        breaking_change=breaking_change,
+    )
 
     print_color("\nFiles to commit:", "blue")
     for file_path in files_to_add:
@@ -448,8 +541,8 @@ def create_commit(
 
 
 def create_branch(branch_type: Optional[int], description: Optional[str]) -> None:
-    resolved_branch_type = resolve_branch_type(branch_type)
-    type_str, _ = BRANCH_TYPES[resolved_branch_type]
+    selected_branch_type = resolve_branch_type(branch_type)
+    type_str = resolve_branch_type_value(selected_branch_type)
 
     resolved_description = resolve_branch_description(description)
     slug = slugify_branch_description(resolved_description)
@@ -552,9 +645,9 @@ def print_usage() -> None:
     print("  grove -c <files...>")
     print("  grove -c -p <files...>")
     print("  grove -cp <files...>")
-    print("  grove -c <files...> <type-number> <title> [description]")
-    print("  grove -c -p <files...> <type-number> <title> [description]")
-    print("  grove -cp <files...> <type-number> <title> [description]")
+    print("  grove -c <files...> <type-number> <description> [body]")
+    print("  grove -c -p <files...> <type-number> <description> [body]")
+    print("  grove -cp <files...> <type-number> <description> [body]")
     print("  grove -b")
     print("  grove -b <type-number> [description]")
     print("  grove push")
@@ -563,9 +656,10 @@ def print_usage() -> None:
     print("  grove -c src/main.py README.md")
     print("  grove -c -p src/main.py README.md")
     print("  grove -cp src/main.py README.md")
-    print("  grove -c src/main.py README.md 1 title-example description-example")
-    print('  grove -cp src/main.py 1 "title" "description"')
+    print('  grove -c src/main.py README.md 1 "add login page"')
+    print('  grove -cp src/main.py 20 "send API event" "BREAKING CHANGE: endpoint contract changed"')
     print("  grove -b 1 add-login-page")
+    print("  grove -b 6 observability-pipeline")
     print("  grove push")
     print("  grove pull")
 
@@ -588,11 +682,11 @@ def main() -> None:
 
     if mode == "-c":
         commit_args, push_after_commit = extract_push_flag(extra_args)
-        files_to_add, commit_type, title, description = parse_commit_arguments(commit_args)
-        create_commit(files_to_add, commit_type, title, description, push_after_commit)
+        files_to_add, commit_type, description, body = parse_commit_arguments(commit_args)
+        create_commit(files_to_add, commit_type, description, body, push_after_commit)
     elif mode == "-cp":
-        files_to_add, commit_type, title, description = parse_commit_arguments(extra_args)
-        create_commit(files_to_add, commit_type, title, description, True)
+        files_to_add, commit_type, description, body = parse_commit_arguments(extra_args)
+        create_commit(files_to_add, commit_type, description, body, True)
     elif mode == "-b":
         branch_type, description = parse_branch_arguments(extra_args)
         create_branch(branch_type, description)
