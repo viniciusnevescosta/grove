@@ -1,0 +1,23 @@
+.footer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem 0 0;
+  color: var(--so-text-faint);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.footer p {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+footer a:hover,
+a:focus-visible {
+  color: var(--so-link);
+  outline: none;
+}

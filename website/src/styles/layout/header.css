@@ -1,0 +1,39 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(18px);
+  background: color-mix(in oklab, var(--so-bg) 0%, transparent);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4rem;
+}
+
+.brand {
+  color: var(--so-heading);
+  font-size: 0.96rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.header-meta,
+.controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.header-meta {
+  flex: 0 0 auto;
+}
+
+.controls {
+  margin-left: auto;
+  flex: 0 1 auto;
+}

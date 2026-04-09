@@ -1,0 +1,23 @@
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-offset) + 0.15rem);
+}
+
+main {
+  padding: 3.25rem 0 4.5rem;
+}
+
+.docs-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 17.5rem;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: start;
+}
+
+.docs-main {
+  min-width: 0;
+}
+
+.footer-shell {
+  margin-top: 1rem;
+}

@@ -1,0 +1,390 @@
+---
+import '../styles/still-orbit.css';
+import '../styles/site.css';
+import packageJson from '../../package.json';
+import { docsContent } from '../scripts/docs';
+import { buildStructuredData, seoKeywords } from '../scripts/seo';
+import { siteConfig } from '../scripts/site';
+
+const {
+  meta,
+  toc,
+  features,
+  branchTypes,
+  commitTypes,
+  installPyUsage,
+  windowsBat,
+  unixInstall,
+  commitUsage,
+  commitExamples,
+  commitPushUsage,
+  commitPushExamples,
+  branchUsage,
+  branchExamples,
+  branchFormat,
+  branchExample,
+  commitOutput,
+  terminalPreview,
+} = docsContent;
+
+const { docsUrl, websiteUrl, githubUrl, authorName, mistThemeColor, ogImagePath } = siteConfig;
+const version = packageJson.version;
+const pageTitle = `${meta.name} | Documentation`;
+const pageDescription = `${meta.description} Installation, usage, and command reference.`;
+const canonicalUrl = new URL(Astro.url.pathname, docsUrl).toString();
+const ogImageUrl = new URL(ogImagePath, docsUrl).toString();
+const sitemapUrl = new URL('/sitemap-index.xml', docsUrl).toString();
+const structuredData = JSON.stringify(
+  buildStructuredData({
+    pageTitle,
+    pageDescription,
+    canonicalUrl,
+    docsUrl,
+    ogImageUrl,
+    githubUrl,
+    version,
+  }),
+);
+---
+
+<html lang="en" data-theme="still-orbit-mist">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={pageDescription} />
+    <meta name="author" content={authorName} />
+    <meta name="keywords" content={seoKeywords.join(', ')} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="sitemap" href={sitemapUrl} />
+    <meta name="theme-color" content={mistThemeColor} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={meta.name} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:url" content={ogImageUrl} />
+    <meta property="og:image:alt" content={`${meta.name} documentation preview`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={`${meta.name} documentation preview`} />
+    <title>{pageTitle}</title>
+    <script type="application/ld+json" set:html={structuredData}></script>
+    <script src="../scripts/theme-init.ts"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell site-header__inner">
+        <div class="header-meta">
+          <span class="header-pill" aria-label={`Version ${version}`}>v{version}</span>
+        </div>
+
+        <div class="controls">
+          <a class="header-link" href={githubUrl} target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
+              <path d="M8 0C3.58 0 0 3.67 0 8.2c0 3.63 2.29 6.7 5.47 7.78.4.08.55-.18.55-.4 0-.2-.01-.85-.01-1.54-2.01.38-2.53-.5-2.69-.97-.09-.24-.48-.97-.82-1.17-.28-.16-.68-.56-.01-.57.63-.01 1.08.6 1.23.85.72 1.24 1.87.89 2.33.68.07-.54.28-.89.51-1.09-1.78-.21-3.64-.92-3.64-4.09 0-.9.31-1.63.82-2.2-.08-.21-.36-1.06.08-2.21 0 0 .67-.22 2.2.84a7.35 7.35 0 0 1 4.01 0c1.53-1.06 2.2-.84 2.2-.84.44 1.15.16 2 .08 2.21.51.57.82 1.29.82 2.2 0 3.18-1.87 3.88-3.65 4.09.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .22.15.49.55.4A8.18 8.18 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z" />
+            </svg>
+            <span>Give it a star on GitHub</span>
+          </a>
+
+          <button class="icon-button" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch theme">
+            <span class="icon-button__glyph" aria-hidden="true">◐</span>
+            <span class="sr-only">Toggle theme</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="shell content__hero" aria-labelledby="hero-title">
+        <div class="hero hero--content">
+          <div class="hero__content">
+            <h1 id="hero-title">{meta.name}</h1>
+            <p class="hero__lead">{meta.description}</p>
+            <p class="hero__microcopy">
+                Grove is based on the ideas behind <strong>Conventional Commits</strong> and <strong>Conventional Branch</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="hero hero--visual">
+          <div class="terminal-preview">
+            <div class="terminal-preview__header">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <pre><code>{terminalPreview}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <div class="shell docs-shell">
+        <div class="docs-main">
+          <section class="section" id="features" data-doc-section aria-labelledby="features-heading">
+            <div class="section__heading">
+              <div>
+                <h2 id="features-heading">Features</h2>
+                <p>Core behavior of Grove for semantic commits, branches, push, and pull.</p>
+              </div>
+            </div>
+
+            <div class="feature-grid">
+              {features.map((feature) => (
+                <article class="feature-card">
+                  <span class="feature-card__marker" aria-hidden="true"></span>
+                  <div>
+                    <h3>{feature.title}</h3>
+                    <p>{feature.description}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section class="section" id="installation" data-doc-section aria-labelledby="installation-heading">
+            <div class="section__heading">
+              <div>
+                <h2 id="installation-heading">Installation</h2>
+                <p>Install Grove with the helper script or set it up manually.</p>
+              </div>
+            </div>
+
+            <div class="prose stack-lg">
+              <div id="using-install-py" class="anchor-offset" data-doc-anchor>
+                <h3>Using install.py</h3>
+                <p>The easiest way is to use the installer script from the repository root.</p>
+                <pre class="code-block"><code>{installPyUsage}</code></pre>
+              </div>
+
+              <div id="manual-installation" class="anchor-offset" data-doc-anchor>
+                <h3>Manual installation</h3>
+                <p>You can also download the main script directly:</p>
+                <pre class="code-block"><code>curl -O {githubUrl}/blob/main/main.py</code></pre>
+              </div>
+
+              <div id="windows" class="anchor-offset" data-doc-anchor>
+                <h3>Windows</h3>
+                <ol class="ordered-list">
+                  <li>Install Python 3.</li>
+                  <li>Download <code class="inline-code">main.py</code>.</li>
+                  <li>Save it locally.</li>
+                  <li>Run it with <code class="inline-code">python main.py</code>.</li>
+                </ol>
+                <p>
+                  You can optionally create a <code class="inline-code">grove.bat</code> file so the command is available as
+                  <code class="inline-code">grove</code>.
+                </p>
+                <pre class="code-block"><code>{windowsBat}</code></pre>
+              </div>
+
+              <div id="macos-linux" class="anchor-offset" data-doc-anchor>
+                <h3>macOS / Linux</h3>
+                <ol class="ordered-list">
+                  <li>Make sure Python 3 is installed.</li>
+                  <li>Save the script as <code class="inline-code">grove</code>.</li>
+                  <li>Add the shebang below at the top of the file.</li>
+                  <li>Make it executable.</li>
+                  <li>Move it to a directory in your <code class="inline-code">PATH</code>.</li>
+                </ol>
+                <pre class="code-block"><code>{unixInstall}</code></pre>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="usage" data-doc-section aria-labelledby="usage-heading">
+            <div class="section__heading">
+              <div>
+                <h2 id="usage-heading">Usage</h2>
+                <p>Grove keeps the flow interactive when you provide only part of the command.</p>
+              </div>
+            </div>
+
+            <div class="prose stack-lg">
+              <div id="commit" class="anchor-offset" data-doc-anchor>
+                <h3>Commit</h3>
+                <pre class="code-block"><code>{commitUsage}</code></pre>
+                <pre class="code-block"><code>{commitExamples}</code></pre>
+                <p>
+                  After confirmation, Grove stages only the provided files, creates the commit, and keeps the process
+                  interactive when arguments are missing.
+                </p>
+                <ul>
+                  <li>Commit descriptions are optional.</li>
+                  <li>Use <code class="inline-code">/br</code> in commit descriptions to create line breaks.</li>
+                </ul>
+              </div>
+
+              <div id="commit-and-push" class="anchor-offset" data-doc-anchor>
+                <h3>Commit and push</h3>
+                <pre class="code-block"><code>{commitPushUsage}</code></pre>
+                <pre class="code-block"><code>{commitPushExamples}</code></pre>
+                <p>
+                  After the commit succeeds, Grove automatically pushes the current local branch to the corresponding remote
+                  branch. If the branch does not yet have an upstream, Grove uses
+                  <code class="inline-code">git push -u origin &lt;current-branch&gt;</code>.
+                </p>
+              </div>
+
+              <div id="branch" class="anchor-offset" data-doc-anchor>
+                <h3>Branch</h3>
+                <pre class="code-block"><code>{branchUsage}</code></pre>
+                <pre class="code-block"><code>{branchExamples}</code></pre>
+                <p>Branch descriptions are normalized to slug format before the branch name is created.</p>
+              </div>
+
+              <div id="push" class="anchor-offset" data-doc-anchor>
+                <h3>Push</h3>
+                <pre class="code-block"><code>grove push</code></pre>
+                <p>Pushes the current local branch to the matching branch on <code class="inline-code">origin</code>.</p>
+                <ul>
+                  <li>
+                    If no upstream is configured yet, Grove uses
+                    <code class="inline-code">git push -u origin &lt;current-branch&gt;</code>.
+                  </li>
+                </ul>
+              </div>
+
+              <div id="pull" class="anchor-offset" data-doc-anchor>
+                <h3>Pull</h3>
+                <pre class="code-block"><code>grove pull</code></pre>
+                <p>
+                  Pulls remote changes from the matching branch on <code class="inline-code">origin</code> into the current local
+                  branch.
+                </p>
+                <ul>
+                  <li>
+                    <code class="inline-code">grove pull</code> pulls from the branch with the same name on
+                    <code class="inline-code">origin</code>.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="behavior" data-doc-section aria-labelledby="behavior-heading">
+            <div class="section__heading">
+              <div>
+                <h2 id="behavior-heading">Behavior</h2>
+                <p>Grove completes missing pieces interactively and only performs Git actions after confirmation.</p>
+              </div>
+            </div>
+
+            <div class="prose">
+              <p>If you provide only part of the command, Grove completes the remaining steps interactively.</p>
+              <ul>
+                <li>If you provide files only, it asks for the commit type, title, and description.</li>
+                <li>If you provide files and type, it asks only for the missing title and description.</li>
+                <li>If you provide branch type only, it asks only for the description.</li>
+                <li>
+                  If you use <code class="inline-code">-cp</code> or <code class="inline-code">-c -p</code>, Grove commits first and
+                  then pushes automatically.
+                </li>
+              </ul>
+              <p>
+                All <code class="inline-code">git add</code> and <code class="inline-code">git commit</code> actions only happen after the
+                final confirmation.
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="commit-types" data-doc-section aria-labelledby="commit-types-heading">
+            <div class="section__heading">
+              <div>
+                <h2 id="commit-types-heading">Commit types</h2>
+                <p>Grove supports semantic commit selection through a numeric menu.</p>
+              </div>
+            </div>
+
+            <div class="type-list type-list--dense">
+              {commitTypes.map(([type, description]) => (
+                <article class="type-card">
+                  <code>{type}</code>
+                  <p>{description}</p>
+                </article>
+              ))}
+            </div>
+
+            <div class="type-support-row type-support-row--compact">
+              <article class="type-support-card">
+                <h3>Example output</h3>
+                <pre class="code-block"><code>{commitOutput}</code></pre>
+              </article>
+            </div>
+          </section>
+
+          <section class="section" id="branch-types" data-doc-section aria-labelledby="branch-types-heading">
+            <div class="section__heading">
+              <div>
+                <h2 id="branch-types-heading">Branch types</h2>
+                <p>The generated branch name follows a semantic format.</p>
+              </div>
+            </div>
+
+            <div class="type-list type-list--branches">
+              {branchTypes.map(([type, description]) => (
+                <article class="type-card">
+                  <code>{type}</code>
+                  <p>{description}</p>
+                </article>
+              ))}
+            </div>
+
+            <div class="type-support-row">
+              <article class="type-support-card">
+                <h3>Format</h3>
+                <pre class="code-block"><code>{branchFormat}</code></pre>
+              </article>
+              <article class="type-support-card">
+                <h3>Example</h3>
+                <pre class="code-block"><code>{branchExample}</code></pre>
+              </article>
+            </div>
+          </section>
+        </div>
+
+        <aside class="toc" aria-label="Table of contents">
+          <div class="toc__inner">
+            <p class="toc__eyebrow">On this page</p>
+            <nav>
+              <ul class="toc__list">
+                {toc.map((item) => (
+                  <li>
+                    <a href={`#${item.id}`} data-toc-link>{item.label}</a>
+                    {item.children && item.children.length > 0 && (
+                      <ul class="toc__nested">
+                        {item.children.map((child) => (
+                          <li>
+                            <a href={`#${child.id}`} data-toc-link>{child.label}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </aside>
+      </div>
+
+      <div class="shell footer-shell">
+        <footer class="footer">
+          <p>
+            Made with <span aria-hidden="true">❤️</span> by
+            <a href={websiteUrl} target="_blank" rel="noopener noreferrer">Vinícius Costa</a>
+          </p>
+        </footer>
+      </div>
+    </main>
+
+    <script src="../scripts/page.ts"></script>
+  </body>
+</html>

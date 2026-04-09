@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+bun.lock
+
+# Build output
+dist/
+build/
+.out/
+.cache/
+coverage/
+.astro
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Package manager logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Framework / tooling
+.next/
+.nuxt/
+.svelte-kit/
+.turbo/
+.vercel/
+
+# Misc
+*.tmp
+*.temp

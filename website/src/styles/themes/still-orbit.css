@@ -1,0 +1,216 @@
+/* Still Orbit theme tokens */
+:root,
+[data-theme="still-orbit-mist"] {
+  color-scheme: light;
+
+  --so-black: oklch(28.1% 0.016 248.4);
+  --so-paper: oklch(95.1% 0.009 78.3);
+
+  --so-base-50: oklch(96.3% 0.009 78.3);
+  --so-base-100: oklch(93.1% 0.014 74.4);
+  --so-base-150: oklch(89% 0.02 72.6);
+  --so-base-200: oklch(83.4% 0.026 69.4);
+  --so-base-300: oklch(74.9% 0.022 62.8);
+  --so-base-400: oklch(68.2% 0.009 67.7);
+  --so-base-500: oklch(61.9% 0.015 248.1);
+  --so-base-600: oklch(48.6% 0.016 251.7);
+  --so-base-700: oklch(38.1% 0.024 248.4);
+  --so-base-800: oklch(34.2% 0.025 246.3);
+  --so-base-850: oklch(31.2% 0.023 248.6);
+  --so-base-900: oklch(28.1% 0.016 248.4);
+  --so-base-950: oklch(22.4% 0.014 253.1);
+
+  --so-red-50: oklch(93.7% 0.016 42.4);
+  --so-red-100: oklch(88.1% 0.031 46.2);
+  --so-red-150: oklch(82.1% 0.046 46);
+  --so-red-200: oklch(75.1% 0.062 43.1);
+  --so-red-300: oklch(66.3% 0.078 40.7);
+  --so-red-400: oklch(59.1% 0.086 37.5);
+  --so-red-500: oklch(52.4% 0.086 33.6);
+  --so-red-600: oklch(46% 0.076 31.4);
+  --so-red-700: oklch(39.8% 0.061 30.2);
+  --so-red-800: oklch(34.7% 0.048 27.5);
+  --so-red-850: oklch(30.8% 0.04 26.8);
+  --so-red-900: oklch(26.6% 0.033 25.5);
+  --so-red-950: oklch(22.4% 0.025 23.5);
+  --so-orange-50: oklch(96.1% 0.015 77.1);
+  --so-orange-100: oklch(92.2% 0.031 77);
+  --so-orange-150: oklch(87.4% 0.047 75.6);
+  --so-orange-200: oklch(81.7% 0.065 72.1);
+  --so-orange-300: oklch(74.9% 0.081 66.7);
+  --so-orange-400: oklch(69.2% 0.094 57.8);
+  --so-orange-500: oklch(62.2% 0.096 53.5);
+  --so-orange-600: oklch(54.2% 0.087 52.4);
+  --so-orange-700: oklch(46.7% 0.072 51.7);
+  --so-orange-800: oklch(40.5% 0.058 52.1);
+  --so-orange-850: oklch(35.8% 0.049 51.8);
+  --so-orange-900: oklch(30.4% 0.04 51.3);
+  --so-orange-950: oklch(24.7% 0.029 51.9);
+  --so-yellow-50: oklch(97.4% 0.01 81.8);
+  --so-yellow-100: oklch(94.4% 0.023 87.2);
+  --so-yellow-150: oklch(90.5% 0.035 88.8);
+  --so-yellow-200: oklch(85.7% 0.049 88.8);
+  --so-yellow-300: oklch(79.8% 0.063 86.4);
+  --so-yellow-400: oklch(74.3% 0.073 89.4);
+  --so-yellow-500: oklch(66.7% 0.071 87.3);
+  --so-yellow-600: oklch(57.4% 0.06 84.7);
+  --so-yellow-700: oklch(49.1% 0.047 85);
+  --so-yellow-800: oklch(42.1% 0.035 85.4);
+  --so-yellow-850: oklch(36.9% 0.027 80.3);
+  --so-yellow-900: oklch(31.1% 0.021 73.1);
+  --so-yellow-950: oklch(24.6% 0.014 57.5);
+  --so-green-50: oklch(95.9% 0.007 151.9);
+  --so-green-100: oklch(91.4% 0.013 149.2);
+  --so-green-150: oklch(85.9% 0.016 154.4);
+  --so-green-200: oklch(79.6% 0.022 158.5);
+  --so-green-300: oklch(71.1% 0.029 164);
+  --so-green-400: oklch(63.7% 0.028 165.1);
+  --so-green-500: oklch(56.2% 0.026 168.1);
+  --so-green-600: oklch(49.3% 0.024 173.1);
+  --so-green-700: oklch(42.5% 0.019 176.2);
+  --so-green-800: oklch(36.5% 0.014 175.5);
+  --so-green-850: oklch(32.4% 0.012 171);
+  --so-green-900: oklch(28.6% 0.01 176.5);
+  --so-green-950: oklch(23.8% 0.008 182.3);
+  --so-cyan-50: oklch(95.4% 0.009 225.1);
+  --so-cyan-100: oklch(91.2% 0.015 229);
+  --so-cyan-150: oklch(86.1% 0.024 227.8);
+  --so-cyan-200: oklch(79.9% 0.034 229.4);
+  --so-cyan-300: oklch(72.2% 0.045 231.3);
+  --so-cyan-400: oklch(64.4% 0.052 235.5);
+  --so-cyan-500: oklch(57.8% 0.054 237);
+  --so-cyan-600: oklch(51.4% 0.05 235.6);
+  --so-cyan-700: oklch(44.6% 0.043 236.6);
+  --so-cyan-800: oklch(38.8% 0.034 232.6);
+  --so-cyan-850: oklch(34.1% 0.029 233);
+  --so-cyan-900: oklch(29.5% 0.024 228.4);
+  --so-cyan-950: oklch(24% 0.019 232.4);
+  --so-blue-50: oklch(95.8% 0.009 242.8);
+  --so-blue-100: oklch(91.9% 0.017 242.4);
+  --so-blue-150: oklch(87% 0.029 241.6);
+  --so-blue-200: oklch(80.5% 0.04 243.6);
+  --so-blue-300: oklch(72.5% 0.058 242.9);
+  --so-blue-400: oklch(64.7% 0.064 244.4);
+  --so-blue-500: oklch(58.1% 0.062 243.6);
+  --so-blue-600: oklch(50.4% 0.055 244.5);
+  --so-blue-700: oklch(43.5% 0.048 245.7);
+  --so-blue-800: oklch(38% 0.038 241.8);
+  --so-blue-850: oklch(33.6% 0.032 241.8);
+  --so-blue-900: oklch(28.9% 0.025 237);
+  --so-blue-950: oklch(22.9% 0.02 239.3);
+  --so-purple-50: oklch(95% 0.007 312.3);
+  --so-purple-100: oklch(89.8% 0.015 308.3);
+  --so-purple-150: oklch(83.5% 0.025 306.9);
+  --so-purple-200: oklch(76% 0.033 306.1);
+  --so-purple-300: oklch(65.8% 0.04 304.5);
+  --so-purple-400: oklch(58.2% 0.042 306);
+  --so-purple-500: oklch(51% 0.038 304.8);
+  --so-purple-600: oklch(44.9% 0.029 306.5);
+  --so-purple-700: oklch(39.7% 0.021 307.9);
+  --so-purple-800: oklch(34.4% 0.015 308);
+  --so-purple-850: oklch(30.5% 0.015 307.9);
+  --so-purple-900: oklch(26.2% 0.012 308);
+  --so-purple-950: oklch(21.4% 0.01 303.7);
+  --so-magenta-50: oklch(95.2% 0.008 357.8);
+  --so-magenta-100: oklch(89.6% 0.018 4.6);
+  --so-magenta-150: oklch(83.5% 0.031 5.2);
+  --so-magenta-200: oklch(76.4% 0.045 5.8);
+  --so-magenta-300: oklch(67.9% 0.06 5);
+  --so-magenta-400: oklch(59.9% 0.068 3);
+  --so-magenta-500: oklch(52.9% 0.07 3.5);
+  --so-magenta-600: oklch(46.4% 0.063 3.9);
+  --so-magenta-700: oklch(40.3% 0.054 3.9);
+  --so-magenta-800: oklch(34.9% 0.042 3.1);
+  --so-magenta-850: oklch(30.9% 0.038 0.5);
+  --so-magenta-900: oklch(26.5% 0.031 2.2);
+  --so-magenta-950: oklch(21.8% 0.021 8.8);
+
+  --so-bg: var(--so-paper);
+  --so-bg-elevated: var(--so-base-50);
+  --so-bg-subtle: var(--so-base-100);
+  --so-ui: var(--so-base-150);
+  --so-ui-strong: var(--so-base-200);
+  --so-border: var(--so-base-200);
+  --so-border-muted: var(--so-base-150);
+
+  --so-text: var(--so-base-700);
+  --so-text-muted: var(--so-base-600);
+  --so-text-faint: var(--so-base-400);
+  --so-heading: var(--so-black);
+
+  --so-link: var(--so-blue-600);
+  --so-link-hover: var(--so-cyan-600);
+
+  --so-primary: var(--so-base-700);
+  --so-primary-contrast: var(--so-base-50);
+  --so-secondary: var(--so-cyan-600);
+  --so-accent: var(--so-orange-400);
+  --so-accent-soft: oklch(84.3% 0.058 66.9);
+
+  --so-success: var(--so-green-600);
+  --so-warning: var(--so-yellow-600);
+  --so-danger: var(--so-red-600);
+  --so-info: var(--so-blue-600);
+
+  --so-selection-bg: oklch(51.4% 0.05 235.6 / 0.18);
+  --so-selection-text: var(--so-black);
+  --so-shadow-color: oklch(28.1% 0.016 248.4 / 0.14);
+}
+
+.dark,
+[data-theme="still-orbit-night"] {
+  color-scheme: dark;
+
+  --so-bg: var(--so-black);
+  --so-bg-elevated: var(--so-base-950);
+  --so-bg-subtle: var(--so-base-900);
+  --so-ui: var(--so-base-850);
+  --so-ui-strong: var(--so-base-800);
+  --so-border: var(--so-base-800);
+  --so-border-muted: var(--so-base-850);
+
+  --so-text: var(--so-base-200);
+  --so-text-muted: var(--so-base-400);
+  --so-text-faint: var(--so-base-500);
+  --so-heading: var(--so-base-50);
+
+  --so-link: var(--so-blue-400);
+  --so-link-hover: var(--so-cyan-400);
+
+  --so-primary: var(--so-base-200);
+  --so-primary-contrast: var(--so-base-950);
+  --so-secondary: var(--so-cyan-400);
+  --so-accent: var(--so-orange-400);
+  --so-accent-soft: oklch(84.3% 0.058 66.9);
+
+  --so-success: var(--so-green-400);
+  --so-warning: var(--so-yellow-400);
+  --so-danger: var(--so-red-400);
+  --so-info: var(--so-blue-400);
+
+  --so-selection-bg: oklch(64.7% 0.064 244.4 / 0.2);
+  --so-selection-text: var(--so-base-50);
+  --so-shadow-color: oklch(0% 0 0 / 0.28);
+}
+
+html {
+  background: var(--so-bg);
+  color: var(--so-text);
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(
+      circle at top,
+      color-mix(in oklab, var(--so-accent-soft) 10%, transparent),
+      transparent 32%
+    ),
+    var(--so-bg);
+  color: var(--so-text);
+}
+
+::selection {
+  background: var(--so-selection-bg);
+  color: var(--so-selection-text);
+}

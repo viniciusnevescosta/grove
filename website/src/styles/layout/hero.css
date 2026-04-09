@@ -1,0 +1,50 @@
+.content__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(20rem, 1.1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  min-height: clamp(20rem, 36vw, 26rem);
+  margin-bottom: 3rem;
+}
+
+.hero {
+  max-width: 48rem;
+  margin-bottom: 0;
+}
+
+.hero--content {
+  max-width: 32rem;
+}
+
+.hero--visual {
+  display: grid;
+  place-items: center;
+  max-width: none;
+}
+
+.hero h1 {
+  color: var(--so-heading);
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: clamp(3.6rem, 9vw, 6.4rem);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+}
+
+.hero__lead {
+  max-width: 40rem;
+  margin-top: 1rem;
+  color: var(--so-text);
+  font-size: clamp(1.06rem, 1.5vw, 1.22rem);
+}
+
+.hero__microcopy {
+  max-width: 36rem;
+  margin-top: 1rem;
+  color: var(--so-text);
+  font-size: 0.95rem;
+}
+
+.hero__microcopy strong {
+  color: var(--so-heading);
+  font-weight: 600;
+}
