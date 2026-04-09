@@ -213,12 +213,13 @@ const structuredData = JSON.stringify(
                 <pre class="code-block"><code>{commitUsage}</code></pre>
                 <pre class="code-block"><code>{commitExamples}</code></pre>
                 <p>
-                  After confirmation, Grove stages only the provided files, creates the commit, and keeps the process
-                  interactive when arguments are missing.
+                  After confirmation, Grove stages only the provided files and creates a Conventional Commit header in the
+                  format <code class="inline-code">&lt;type&gt;[optional scope][optional !]: &lt;description&gt;</code>.
                 </p>
                 <ul>
-                  <li>Commit descriptions are optional.</li>
-                  <li>Use <code class="inline-code">/br</code> in commit descriptions to create line breaks.</li>
+                  <li>The scope is optional.</li>
+                  <li>Breaking changes are marked with <code class="inline-code">!</code> before the colon.</li>
+                  <li>Use <code class="inline-code">/br</code> in the optional body to create line breaks or footer blocks.</li>
                 </ul>
               </div>
 
@@ -237,7 +238,7 @@ const structuredData = JSON.stringify(
                 <h3>Branch</h3>
                 <pre class="code-block"><code>{branchUsage}</code></pre>
                 <pre class="code-block"><code>{branchExamples}</code></pre>
-                <p>Branch descriptions are normalized to slug format before the branch name is created.</p>
+                <p>Branch descriptions are normalized to slug format before the branch name is created, and the last menu option lets you provide a custom type such as <code class="inline-code">system</code>.</p>
               </div>
 
               <div id="push" class="anchor-offset" data-doc-anchor>
@@ -280,9 +281,9 @@ const structuredData = JSON.stringify(
             <div class="prose">
               <p>If you provide only part of the command, Grove completes the remaining steps interactively.</p>
               <ul>
-                <li>If you provide files only, it asks for the commit type, title, and description.</li>
-                <li>If you provide files and type, it asks only for the missing title and description.</li>
-                <li>If you provide branch type only, it asks only for the description.</li>
+                <li>If you provide files only, it asks for the commit type, optional scope, breaking flag, description, and optional body.</li>
+                <li>If you provide files and type, it keeps the missing Conventional Commit pieces interactive.</li>
+                <li>If you provide branch type only, it asks only for the missing description, and custom types are supported in the last option.</li>
                 <li>
                   If you use <code class="inline-code">-cp</code> or <code class="inline-code">-c -p</code>, Grove commits first and
                   then pushes automatically.
@@ -299,7 +300,7 @@ const structuredData = JSON.stringify(
             <div class="section__heading">
               <div>
                 <h2 id="commit-types-heading">Commit types</h2>
-                <p>Grove supports semantic commit selection through a numeric menu.</p>
+                <p>Grove provides a numeric menu of common types and a final <code class="inline-code">Custom</code> option for your own Conventional Commit noun.</p>
               </div>
             </div>
 
@@ -324,7 +325,7 @@ const structuredData = JSON.stringify(
             <div class="section__heading">
               <div>
                 <h2 id="branch-types-heading">Branch types</h2>
-                <p>The generated branch name follows a semantic format.</p>
+                <p>The generated branch name follows a semantic format, with a final <code class="inline-code">Custom</code> option for your own type prefix.</p>
               </div>
             </div>
 
