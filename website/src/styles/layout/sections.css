@@ -327,7 +327,7 @@
 }
 
 .toc a.is-active,
-.toc a[aria-current='true'] {
+.toc a[aria-current="true"] {
   color: var(--so-heading);
   background: color-mix(in oklab, var(--so-ui) 72%, transparent);
 }

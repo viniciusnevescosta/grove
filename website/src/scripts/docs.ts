@@ -1,115 +1,116 @@
-import { meta } from './stillOrbit';
+import { meta } from "./stillOrbit";
 
 export const docsContent = {
   meta,
   toc: [
-    { id: 'features', label: 'Features' },
+    { id: "features", label: "Features" },
     {
-      id: 'installation',
-      label: 'Installation',
+      id: "installation",
+      label: "Installation",
       children: [
-        { id: 'using-install-py', label: 'Using install.py' },
-        { id: 'manual-installation', label: 'Manual installation' },
-        { id: 'windows', label: 'Windows' },
-        { id: 'macos-linux', label: 'macOS / Linux' },
+        { id: "using-install-py", label: "Using install.py" },
+        { id: "manual-installation", label: "Manual installation" },
+        { id: "windows", label: "Windows" },
+        { id: "macos-linux", label: "macOS / Linux" },
       ],
     },
     {
-      id: 'usage',
-      label: 'Usage',
+      id: "usage",
+      label: "Usage",
       children: [
-        { id: 'commit', label: 'Commit' },
-        { id: 'commit-and-push', label: 'Commit and push' },
-        { id: 'branch', label: 'Branch' },
-        { id: 'push', label: 'Push' },
-        { id: 'pull', label: 'Pull' },
+        { id: "commit", label: "Commit" },
+        { id: "commit-and-push", label: "Commit and push" },
+        { id: "branch", label: "Branch" },
+        { id: "push", label: "Push" },
+        { id: "pull", label: "Pull" },
       ],
     },
-    { id: 'behavior', label: 'Behavior' },
-    { id: 'commit-types', label: 'Commit types' },
-    { id: 'branch-types', label: 'Branch types' },
+    { id: "behavior", label: "Behavior" },
+    { id: "commit-types", label: "Commit types" },
+    { id: "branch-types", label: "Branch types" },
   ] as const,
   features: [
     {
-      title: 'Strict Conventional Commit header',
+      title: "Strict Conventional Commit header",
       description:
-        'Builds commit messages as `<type>[optional scope][optional !]: <description>` instead of using a custom Grove-specific header.',
+        "Builds commit messages as `<type>[optional scope][optional !]: <description>` instead of using a custom Grove-specific header.",
     },
     {
-      title: 'Interactive scope and breaking flag',
+      title: "Interactive scope and breaking flag",
       description:
-        'Lets you add an optional scope and mark breaking changes with `!` while keeping the flow guided and fast.',
+        "Lets you add an optional scope and mark breaking changes with `!` while keeping the flow guided and fast.",
     },
     {
-      title: 'Custom commit and branch types',
+      title: "Custom commit and branch types",
       description:
-        'The last menu option is `Custom`, so you can create headers like `system(api)!: test` and branches like `system/observability`.',
+        "The last menu option is `Custom`, so you can create headers like `system(api)!: test` and branches like `system/observability`.",
     },
     {
-      title: 'Interactive commits',
+      title: "Interactive commits",
       description:
-        'Guides you through semantic commits when arguments are missing and keeps the flow fast when they are present.',
+        "Guides you through semantic commits when arguments are missing and keeps the flow fast when they are present.",
     },
     {
-      title: 'Interactive branches',
+      title: "Interactive branches",
       description:
-        'Creates semantic branch names from a guided prompt and switches to the branch automatically.',
+        "Creates semantic branch names from a guided prompt and switches to the branch automatically.",
     },
     {
-      title: 'Explicit staging only',
+      title: "Explicit staging only",
       description:
-        'Stages only the files you passed to the command instead of adding unrelated changes from the repository.',
+        "Stages only the files you passed to the command instead of adding unrelated changes from the repository.",
     },
     {
-      title: 'Commit and push',
+      title: "Commit and push",
       description:
-        'Supports one-step commit and push with `-cp` or `-c -p`, using the current branch as the remote target.',
+        "Supports one-step commit and push with `-cp` or `-c -p`, using the current branch as the remote target.",
     },
     {
-      title: 'Smart remote behavior',
+      title: "Smart remote behavior",
       description:
-        'Pushes and pulls against the matching branch on `origin`, setting upstream automatically when needed.',
+        "Pushes and pulls against the matching branch on `origin`, setting upstream automatically when needed.",
     },
     {
-      title: 'Safer confirmation flow',
+      title: "Safer confirmation flow",
       description:
-        'All `git add` and `git commit` actions happen only after the final confirmation prompt.',
+        "All `git add` and `git commit` actions happen only after the final confirmation prompt.",
     },
   ] as const,
   branchTypes: [
-    ['feat', 'For new features.'],
-    ['fix', 'For bug fixes.'],
-    ['hotfix', 'For urgent fixes.'],
-    ['release', 'For release preparation.'],
-    ['chore', 'For maintenance tasks.'],
-    ['custom', 'Provide your own branch type, such as `system`.'],
+    ["feat", "For new features."],
+    ["fix", "For bug fixes."],
+    ["hotfix", "For urgent fixes."],
+    ["release", "For release preparation."],
+    ["chore", "For maintenance tasks."],
+    ["custom", "Provide your own branch type, such as `system`."],
   ] as const,
   commitTypes: [
-    ['feat', 'Adds a new feature.'],
-    ['fix', 'Represents a bug fix.'],
-    ['docs', 'Documentation changes.'],
-    ['test', 'Test additions or updates.'],
-    ['build', 'Build system or dependency changes.'],
-    ['perf', 'Performance improvements.'],
-    ['style', 'Formatting or style-only changes.'],
-    ['refactor', 'Code restructuring without changing behavior.'],
-    ['chore', 'Routine maintenance tasks.'],
-    ['ci', 'CI/CD configuration changes.'],
-    ['revert', 'Reverts a previous change.'],
-    ['security', 'Security-related changes.'],
-    ['wip', 'Work in progress.'],
-    ['raw', 'Raw data updates.'],
-    ['cleanup', 'Cleanup or dead code removal.'],
-    ['remove', 'Files or code removals.'],
-    ['locale', 'Localization updates.'],
-    ['access', 'Accessibility improvements.'],
-    ['ux', 'User interface or user experience changes.'],
-    ['custom', 'Provide your own type, such as `system`.'],
+    ["feat", "Adds a new feature."],
+    ["fix", "Represents a bug fix."],
+    ["docs", "Documentation changes."],
+    ["test", "Test additions or updates."],
+    ["build", "Build system or dependency changes."],
+    ["perf", "Performance improvements."],
+    ["style", "Formatting or style-only changes."],
+    ["refactor", "Code restructuring without changing behavior."],
+    ["chore", "Routine maintenance tasks."],
+    ["ci", "CI/CD configuration changes."],
+    ["revert", "Reverts a previous change."],
+    ["security", "Security-related changes."],
+    ["wip", "Work in progress."],
+    ["raw", "Raw data updates."],
+    ["cleanup", "Cleanup or dead code removal."],
+    ["remove", "Files or code removals."],
+    ["locale", "Localization updates."],
+    ["access", "Accessibility improvements."],
+    ["ux", "User interface or user experience changes."],
+    ["custom", "Provide your own type, such as `system`."],
   ] as const,
-  installPyUsage: `python install.py
+  installPyUsage: `curl -o install.py https://github.com/viniciusnevescosta/grove/blob/main/install.py
+python install.py
 python install.py install
-python install.py update
-python install.py uninstall`,
+# python install.py update
+# python install.py uninstall`,
   windowsBat: `@echo off
 python C:\\path\\to\\main.py %*`,
   unixInstall: `#!/usr/bin/env python3
