@@ -107,10 +107,7 @@ export const docsContent = {
     ["custom", "Provide your own type, such as `system`."],
   ] as const,
   installPyUsage: `curl -o install.py https://github.com/viniciusnevescosta/grove/blob/main/install.py
-python install.py
-python install.py install
-# python install.py update
-# python install.py uninstall`,
+python install.py`,
   windowsBat: `@echo off
 python C:\\path\\to\\main.py %*`,
   unixInstall: `#!/usr/bin/env python3
