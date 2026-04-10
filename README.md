@@ -16,4 +16,4 @@ If you want to contribute:
 
 ## License
 
-This project is distributed under the license defined in this repository.
+This project is distributed under the [GPLv3 license](LICENSE).
