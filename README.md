@@ -4,6 +4,8 @@ Semantic Git helper for commits, branches, push, and pull.
 
 Grove is inspired by Conventional Commits and Conventional Branch, helping keep Git workflows more consistent and organized.
 
+[Documentation reference.](https://grove.viniciusnevescosta.com)
+
 ## Contributing
 
 Contributions are welcome.
